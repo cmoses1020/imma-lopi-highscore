@@ -8,6 +8,20 @@ module.exports = {
             },
             backgroundImage: {
                 'pink-pattern': "url('../lopi_assets/cute-pink-background-grid-pattern-pastel-minimal.avif')",
+            },
+            colors: {
+                'lopi-purple': {
+                    '50': '#fbf4ff',
+                    '100': '#f5e7ff',
+                    '200': '#eed3ff',
+                    '300': '#e0b0ff',
+                    '400': '#cd7eff',
+                    '500': '#ba4cff',
+                    '600': '#a829f4',
+                    '700': '#9219d7',
+                    '800': '#7b1aaf',
+                    '900': '#561378',
+                },
             }
         },
     },

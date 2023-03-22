@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\Auth;
 
-use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -18,7 +17,7 @@ class Login extends Component
     public $remember = false;
 
     protected $rules = [
-        'email' => ['required', 'email'],
+        'email' => ['required'],
         'password' => ['required'],
     ];
 
@@ -26,7 +25,14 @@ class Login extends Component
     {
         $this->validate();
 
-        if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        $data = ['password' => $this->password];
+        if (str($this->email)->contains('@')) {
+            $data = array_merge($data, ['email' => $this->email]);
+        } else {
+            $data = array_merge($data, ['name' => $this->email]);
+        }
+
+        if (! Auth::attempt($data, $this->remember)) {
             $this->addError('email', trans('auth.failed'));
 
             return;

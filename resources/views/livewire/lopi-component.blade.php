@@ -1,4 +1,4 @@
-<div class="relative flex justify-center items-center text-center h-screen max-h-screen overflow-hidden" x-data="lopi()" x-ref="main">
+<div class="relative flex justify-center items-center text-center h-screen max-h-screen overflow-hidden" x-data="lopi()" wire:ignore x-ref="main">
     <div>
         <img class="mx-auto w-[200px]" src="{{ Vite::asset('resources/lopi_assets/lopibig.png') }}"></img>
         <h1 class="mt-[10px] mb-[5px] text-4xl font-bold">Enjoy some Lopi! <span class="text-[#561378] text-sm">(actually Jim)</span></h1>
@@ -12,6 +12,21 @@
             class="block w-full text-[15px] bg-[#ffadd2] text-white font-bold py-[10px] px-[20px] border border-white hover:bg-opacity-80 hover:shadow-[#ffadd2] active:shadow-[#ffadd2] hover:shadow-md active:shadow-2xl active:bg-white active:text-[#ffadd2] active:border-[#ffadd2]"
         >I'm Lopi</button>
         
+        @auth
+            <div class="m-[20px] text-[16px] text-black font-bold group">
+                Welcome back, <span class="text-lopi-purple-900">{{ Auth::user()->name }}</span>!
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="font-semibold text-lopi-purple-900 hover:text-lopi-purple-400 text-xs"
+                    >Logout</button>
+                </form>
+            </div>
+            <div class="m-[20px] text-[16px] text-black font-bold group" x-show="rank">
+                You are in <span x-text="rank" class="text-lopi-purple-600"></span> place
+            </div>
+        @endauth
         <div class="m-[20px] text-[16px] text-black font-bold group">
             <a href="https://www.youtube.com/@Punkalopi" target="_blank">
                 Punkalopi's Youtube Channel
@@ -24,6 +39,19 @@
                 <span class="text-[#561378] text-sm group-hover:text-purple-500/80">(silly bird app, very fun!)</span>
             </a>
         </div>
+        <div class="m-[20px] text-[16px] text-black font-bold group">
+            <a href="{{ route('leaderboard') }}" class="text-[#561378]  group-hover:text-purple-500/80">
+                Leader Boarder
+            </a>
+        </div>
+        @guest
+            <div class="text-[16px] text-black font-bold">
+                <a href="{{ route('login') }}" class="text-[#561378] hover:text-purple-500/80">Login</a>
+                or
+                <a href="{{ route('register') }}" class="text-[#561378] hover:text-purple-500/80">Register<a/>
+                to track your Lopi count!
+            </div>
+        @endguest
     </div>
 </div>
 
@@ -31,15 +59,27 @@
     <script>
         let lopi = () => {
             return {
+                init() {
+                    if (!this.isGuest) {
+                        window.addEventListener('beforeunload', (event) => {
+                            this.$wire.call('lopiCount', this.count)
+                        })
+                        this.rank = this.$wire.call('rank')
+                    }
+                },
                 sounds: [
                     new Audio("{{ Vite::asset('resources/lopi_assets/1.mp3') }}"),
                     new Audio("{{ Vite::asset('resources/lopi_assets/2.mp3') }}"),
                     new Audio("{{ Vite::asset('resources/lopi_assets/3.mp3') }}"),
                 ],
+                rank: null,
+                isGuest: @js(auth()->guest()),
+                lastUpdate: null,
                 lopiImage: "{{ Vite::asset('resources/lopi_assets/lopi.png') }}",
-                count: 0,
+                count: @js($this->lopiCount),
                 lopiPopup() {
-                    this.sounds[Math.floor(Math.random()*this.sounds.length)].play()
+                    index = Math.floor(Math.random()*(this.sounds.length))
+                    this.sounds[index].cloneNode(true).play()
                     this.count++
 
                     let lopiImage = document.createElement('img')
@@ -66,6 +106,13 @@
                     setTimeout(() => {
                         lopiImage.remove()
                     }, 1000)
+                    {{-- debounce lopicount when being clicked allot --}}
+
+                    if (!this.isGuest && (this.lastUpdate === null || (new Date() - this.lastUpdate) > 2000)) {
+                        this.lastUpdate = new Date()
+                        this.rank = this.$wire.call('rank')
+                        this.$wire.call('lopiCount', this.count)
+                    }
                 }
             }
         }

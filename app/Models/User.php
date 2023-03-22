@@ -6,7 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
+use NumberFormatter;
 
 class User extends Authenticatable
 {
@@ -21,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'lopi_count',
     ];
 
     /**
@@ -41,4 +44,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getPlaceInLeaderBoardAttribute()
+    {
+        $rank = DB::table(function ($query) {
+            $query->select('id', 'lopi_count', DB::raw('RANK() OVER (ORDER BY lopi_count DESC, id ASC) as user_rank'))
+                ->from('users');
+        })
+            ->select('user_rank')
+            ->where('id', $this->id)
+            ->first()
+            ->user_rank;
+
+        $nf = new NumberFormatter('en_US', NumberFormatter::ORDINAL);
+
+        return $nf->format($rank);
+    }
 }

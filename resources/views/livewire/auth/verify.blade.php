@@ -3,7 +3,7 @@
 <div>
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
         <a href="{{ route('home') }}">
-            <x-logo class="w-auto h-16 mx-auto text-indigo-600" />
+            <x-logo class="w-auto h-16 mx-auto text-lopi-purple-600" />
         </a>
 
         <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900 leading-9">
@@ -12,7 +12,7 @@
 
         <p class="mt-2 text-sm text-center text-gray-600 leading-5 max-w">
             Or
-            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+            <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="font-medium text-lopi-purple-600 hover:text-lopi-purple-500 focus:outline-none focus:underline transition ease-in-out duration-150">
                 sign out
             </a>
 
@@ -38,7 +38,7 @@
                 <p>Before proceeding, please check your email for a verification link.</p>
 
                 <p class="mt-3">
-                    If you did not receive the email, <a wire:click="resend" class="text-indigo-700 cursor-pointer hover:text-indigo-600 focus:outline-none focus:underline transition ease-in-out duration-150">click here to request another</a>.
+                    If you did not receive the email, <a wire:click="resend" class="text-lopi-purple-700 cursor-pointer hover:text-lopi-purple-600 focus:outline-none focus:underline transition ease-in-out duration-150">click here to request another</a>.
                 </p>
             </div>
         </div>
