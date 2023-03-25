@@ -47,7 +47,7 @@
                                 {{ $user->created_at->format('g:i A') }}
                             </td>
                             <td class="px-6 py-4 tabular-nums text-right">
-                                {{ $user->lopi_count }}
+                                {{ $user->click_count }}
                             </td>
                         </tr>
                     @endforeach

@@ -9,6 +9,6 @@ class LeaderBoardController extends Controller
     public function __invoke()
     {
         return view('leaderboard')
-            ->with('users', User::orderBy('lopi_count', 'desc')->paginate('50'));
+            ->with('users', User::orderBy('click_count', 'desc')->paginate('50'));
     }
 }

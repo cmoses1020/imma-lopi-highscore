@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Click;
 use Livewire\Component;
 
 class LopiComponent extends Component
@@ -10,19 +11,24 @@ class LopiComponent extends Component
 
     public function mount()
     {
-        $this->lopiCount = auth()->user()->lopi_count ?? 0;
+        $this->lopiCount = auth()->user()?->clicks->count() ?? 0;
     }
 
-    public function lopiCount($count)
+    public function getRankAndTotalClicks()
     {
-        auth()->user()->update([
-            'lopi_count' => $count,
+        return [
+            'rank' => auth()->user()->placeInLeaderboard ?? null,
+            'total_clicks' => Click::count(),
+        ];
+    }
+
+    public function click()
+    {
+        Click::create([
+            'user_id' => auth()->user()->id ?? null,
+            'ip' => request()->ip(),
+            'user_agent' => request()->userAgent(),
         ]);
-    }
-
-    public function rank()
-    {
-        return auth()->user()->placeInLeaderboard;
     }
 
     public function render()

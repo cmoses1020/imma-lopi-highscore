@@ -9,8 +9,10 @@
             @keydown.enter.prevent="null"
             @keydown.space.prevent="null"
             x-on:click="lopiPopup"
-            class="block w-full text-[15px] bg-[#ffadd2] text-white font-bold py-[10px] px-[20px] border border-white hover:bg-opacity-80 hover:shadow-[#ffadd2] active:shadow-[#ffadd2] hover:shadow-md active:shadow-2xl active:bg-white active:text-[#ffadd2] active:border-[#ffadd2]"
-        >I'm Lopi</button>
+            class="block w-full text-[15px] bg-[#ffadd2] text-white font-bold py-[10px] px-[20px] border border-white hover:bg-opacity-80 hover:shadow-[#ffadd2] active:shadow-[#ffadd2] hover:shadow-md active:shadow-2xl active:bg-white active:text-[#ffadd2] active:border-[#ffadd2] shadow-md"
+        >
+            I'm Lopi
+        </button>
         
         @auth
             <div class="m-[20px] text-[16px] text-black font-bold group">
@@ -39,7 +41,11 @@
                 <span class="text-[#561378] text-sm group-hover:text-purple-500/80">(silly bird app, very fun!)</span>
             </a>
         </div>
-        <div class="m-[20px] text-[16px] text-black font-bold group">
+        <div class="mt-[20px] text-lg font-['Impact']">
+            <p>TOTAL CLICKER COUNT</p>
+            <p class="text-4xl" x-text="totalClicks"></p>
+        </div>
+        <div class="mt-[20px] text-[15px] text-black font-bold group">
             <a href="{{ route('leaderboard') }}" class="text-[#561378]  group-hover:text-purple-500/80">
                 Leader Boarder
             </a>
@@ -52,7 +58,9 @@
                 to track your Lopi count!
             </div>
         @endguest
+        <livewire:high-score-board />
     </div>
+
 </div>
 
 @pushOnce('scripts')
@@ -64,8 +72,19 @@
                         window.addEventListener('beforeunload', (event) => {
                             this.$wire.call('lopiCount', this.count)
                         })
-                        this.rank = this.$wire.call('rank')
+
                     }
+                    this.$wire.call('getRankAndTotalClicks').then((data) => {
+                        this.rank = data.rank
+                        this.totalClicks = data.total_clicks
+                        setInterval(() => {
+                            this.$wire.call('getRankAndTotalClicks').then((data) => {
+                                console.log(data)
+                                this.rank = data.rank
+                                this.totalClicks = data.total_clicks
+                            })
+                        }, 500)
+                    })
                 },
                 sounds: [
                     new Audio("{{ Vite::asset('resources/lopi_assets/1.mp3') }}"),
@@ -76,7 +95,8 @@
                 isGuest: @js(auth()->guest()),
                 lastUpdate: null,
                 lopiImage: "{{ Vite::asset('resources/lopi_assets/lopi.png') }}",
-                count: @js($this->lopiCount),
+                count: @js($lopiCount),
+                totalClicks: 0,
                 lopiPopup() {
                     index = Math.floor(Math.random()*(this.sounds.length))
                     this.sounds[index].cloneNode(true).play()
@@ -107,10 +127,9 @@
                         lopiImage.remove()
                     }, 1000)
                     {{-- debounce lopicount when being clicked allot --}}
-
+                    this.$wire.call('click')
                     if (!this.isGuest && (this.lastUpdate === null || (new Date() - this.lastUpdate) > 2000)) {
                         this.lastUpdate = new Date()
-                        this.rank = this.$wire.call('rank')
                         this.$wire.call('lopiCount', this.count)
                     }
                 }
