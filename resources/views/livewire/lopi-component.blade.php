@@ -79,12 +79,21 @@
                         this.totalClicks = data.total_clicks
                         setInterval(() => {
                             this.$wire.call('getRankAndTotalClicks').then((data) => {
-                                console.log(data)
                                 this.rank = data.rank
-                                this.totalClicks = data.total_clicks
+
+                                this.animateCountUp(data.total_clicks)
                             })
                         }, 500)
                     })
+                },
+                animateCountUp(count) {
+                    let interval = setInterval(() => {
+                        if (this.totalClicks < count) {
+                            this.totalClicks++
+                        } else {
+                            clearInterval(interval)
+                        }
+                    }, 1000 / 15)
                 },
                 sounds: [
                     new Audio("{{ Vite::asset('resources/lopi_assets/1.mp3') }}"),

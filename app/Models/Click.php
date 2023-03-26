@@ -14,4 +14,9 @@ class Click extends Model
         'ip',
         'user_agent',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

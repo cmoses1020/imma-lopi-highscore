@@ -26,6 +26,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', LopiComponent::class)
     ->name('home');
 
+Route::get('high-score', fn () => view('high-score'))
+    ->name('high-score');
+
 Route::get('leaderboard', LeaderBoardController::class)
     ->name('leaderboard');
 
