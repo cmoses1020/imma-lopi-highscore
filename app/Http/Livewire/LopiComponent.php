@@ -7,20 +7,17 @@ use Livewire\Component;
 
 class LopiComponent extends Component
 {
-    public $lopiCount;
+    public $userClicks = 0;
 
-    public function mount()
-    {
-        $this->lopiCount = auth()->user()?->clicks->count() ?? 0;
-    }
+    public $totalClicks = 0;
 
-    public function getRankAndClicks()
+    public $rank = null;
+
+    public function poll()
     {
-        return [
-            'rank' => auth()->user()->placeInLeaderboard ?? null,
-            'user_clicks' => auth()->user()?->clicks->count() ?? 0,
-            'total_clicks' => Click::count(),
-        ];
+        $this->userClicks = auth()->user()?->clicks->count() ?? 0;
+        $this->totalClicks = Click::count();
+        $this->rank = auth()->user()?->rankWithOrdinal ?? null;
     }
 
     public function click()
@@ -30,6 +27,7 @@ class LopiComponent extends Component
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
+        $this->poll();
     }
 
     public function render()
