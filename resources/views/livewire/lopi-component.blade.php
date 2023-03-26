@@ -1,19 +1,18 @@
 <div 
-    class="relative flex justify-center items-center text-center h-screen max-h-screen overflow-hidden"
+    class="flex justify-center items-center text-center mt-40"
     x-data="lopi()"
     wire:poll.1000ms="poll"
 > 
     <div
-        class="absolute top-0 left-0 w-screen h-screen z-10 pointer-events-none"
+        class="fixed top-0 left-0 w-screen h-screen z-10 pointer-events-none"
         x-ref="overlay"
         wire:ignore
-    >
-    </div>
+    ></div>
     <div>
         <img class="mx-auto w-[200px]" src="{{ Vite::asset('resources/lopi_assets/lopibig.png') }}"></img>
         <h1 class="mt-[10px] mb-[5px] text-4xl font-bold">Enjoy some Lopi! <span class="text-[#561378] text-sm">(actually Jim)</span></h1>
         
-        <div wire:ingore x-text="client.userClicks" class="text-[#444] text-[24px] font-bold mt-[10px] font-['Trebuchet_MS']"></div>
+        <div wire:ingore x-text="client.userClicks" class="text-[#444] text-[24px] font-bold mt-[10px] font-['Trebuchet_MS'] relative z-50"></div>
 
         <button
             @keydown.enter.prevent="null"
@@ -104,13 +103,14 @@
                     requestAnimationFrame(this.animate.bind(this))
                 },
                 animateCounts() {
-                    ['userClicks', 'totalClicks'].forEach((key) => {
-                        if (this.client[key] > this.server[key]) {
-                            this.client[key] -= Math.max(1, Math.floor((this.client[key] - this.server[key]) / 10))
-                        } else if (this.client[key] < this.server[key]) {
-                            this.client[key] += Math.max(1, Math.floor((this.server[key] - this.client[key]) / 10))
-                        }
-                    })
+                    ['userClicks', 'totalClicks']
+                        .forEach((key) => {
+                            if (this.client[key] > this.server[key]) {
+                                this.client[key] -= Math.max(1, Math.floor((this.client[key] - this.server[key]) / 10))
+                            } else if (this.client[key] < this.server[key]) {
+                                this.client[key] += Math.max(1, Math.floor((this.server[key] - this.client[key]) / 10))
+                            }
+                        })
                 },
                 isGuest: @js(auth()),
                 lopis: [],
@@ -121,12 +121,18 @@
             }
         }
 
+        let preloadedSounds = [
+            new Audio("{{ Vite::asset('resources/lopi_assets/1.mp3') }}"),
+            new Audio("{{ Vite::asset('resources/lopi_assets/2.mp3') }}"),
+            new Audio("{{ Vite::asset('resources/lopi_assets/3.mp3') }}"),
+        ]
+        preloadedSounds.forEach((sound) => {
+            sound.load()
+        })
+
         class Lopi {
-            sounds = [
-                new Audio("{{ Vite::asset('resources/lopi_assets/1.mp3') }}"),
-                new Audio("{{ Vite::asset('resources/lopi_assets/2.mp3') }}"),
-                new Audio("{{ Vite::asset('resources/lopi_assets/3.mp3') }}"),
-            ];
+            // get random sound from preloaded sound
+            sound = preloadedSounds[Math.floor(Math.random()*(preloadedSounds.length))].cloneNode(true)
             image = "{{ Vite::asset('resources/lopi_assets/lopi.png') }}";
             element = null;
             createTime = null;
@@ -137,7 +143,8 @@
             fadeTime = Math.floor(Math.random() * 4000) + 1000;
             faded = false
             make(overlay) {
-                this.sounds[Math.floor(Math.random()*(this.sounds.length))].cloneNode().play()
+                this.sound.playbackRate = Math.random() * 1.75 + .25
+                this.sound.play()
                 this.element = document.createElement('img')
                 this.element.src = this.image
 

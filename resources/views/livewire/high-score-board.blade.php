@@ -1,16 +1,20 @@
-<div wire:ignore>
+<div x-data="scoreBoard" class="mb-24" wire:poll.1000ms="poll">
     <div class="text-3xl mb-2 text-center">
         High Scores
     </div>
 
-    <div class="space-y-2 relative" x-data="scoreBoard">
-        <template x-for="(user, index) in users" x-bind:key="index">
+    <div
+        class="space-y-2 relative overflow-clip"
+        wire:ignore
+        :style="{height: client.users.filter((user) => user.markForDeletionAt == null).length * 30 + 'px'}"
+    >
+        <template x-for="(user, index) in client.users" x-bind:key="index">
             <div class="flex w-full justify-between absolute transition-all top-0 duration-[1000ms] ease-in-out"
                 :style="{top: user.position.top + 'px', opacity: user.opacity}"
             >
-                <div x-text="user.rank_with_ordinal"></div>
+                <div x-text="user.client.rank_with_ordinal"></div>
                 <div x-text="user.name"></div>
-                <div x-text="user.click_count"></div>
+                <div x-text="user.client.click_count"></div>
             </div>
         </template>
     </div>
@@ -22,50 +26,55 @@
         let scoreBoard = () => {
             return {
                 init() {
-                    //set interval to get users every 1 seconds
-                    this.updateUsers()
-                    setInterval(() => {
-                        this.updateUsers()
-                    }, 1000)
+                    requestAnimationFrame(this.animate.bind(this))
                 },
-                users: [],
+                animate(timeStamp) {
+                    this.updateUsers(timeStamp)
+                    requestAnimationFrame(this.animate.bind(this))
+                },
+                client: {
+                    users: []
+                },
+                server: {
+                    users: @entangle('users')
+                },
+
                 rank: null,
                 totalClicks: 0,
-                updateUsers() {
-                    this.$wire.getUsers().then((data) => {
-                        data.forEach((user, index) => {
-                            // if this.users already contains the user update it, else create a new one
-                            let userIndex = this.users.findIndex((u) => u.id == user.id)
-                            if (userIndex > -1) {
-                                this.users[userIndex].new.rank = user.user_rank
-                                this.users[userIndex].new.click_count = user.click_count
-                                this.users[userIndex].new.rank_with_ordinal = user.rank_with_ordinal
-                            } else {
-                                this.users.push(new User(user))
-                            }
-                        })
-                        // if user is in the old data and not the new data mark if for deleteion
-                        this.users.forEach((user) => {
-                            if (data.findIndex((u) => u.id == user.id) == -1) {
-                                user.markForDeletion()
-                            }
-                        })
+                updateUsers(timeStamp) {
+                    this.server.users.forEach((user) => {
+                        let existingUser = this.client.users.find((u) => u.id == user.id)
+                        if (existingUser) {
+                            existingUser.server.rank = user.user_rank
+                            existingUser.server.click_count = user.click_count
+                            existingUser.server.rank_with_ordinal = user.rank_with_ordinal
+                            existingUser.markForDeletionAt = null
+                        } else {
+                            this.client.users.push(new User(user))
+                        }
                     })
-                        this.sortUsers()
-                        this.users.forEach((user) => {
-                            user.setPoisition()
-                        })
-                        this.deleteUsers()
+
+                    this.sortUsers()
+                    this.client.users.forEach((user) => {
+                        if (!this.server.users.find((u) => u.id == user.id)) {
+                            user.markForDeletion(timeStamp)
+                        }
+                    })
+                    this.client.users.forEach((user) => user.setPoisition())
+                    this.deleteUsers(timeStamp)
                 },
                 sortUsers() {
-                    this.users.slice()
+                    this.client.users
+                        .slice()
                         .filter((user) => user.markForDeletionAt == null)
-                        .sort((a, b) => a.new.rank - b.new.rank)
-                        .forEach((user, index) => {user.index = index})
+                        .sort((a, b) => a.server.rank - b.server.rank)
+                        .forEach((user, index) => {
+                            user.index = index
+                        })
                 },
-                deleteUsers() {
-                    this.users = this.users.filter((user) => {
-                        return user.markForDeletionAt == null || user.markForDeletionAt > Date.now()
+                deleteUsers(timeStamp) {
+                    this.client.users = this.client.users.filter((user) => {
+                        return user.markForDeletionAt == null || user.markForDeletionAt > timeStamp
                     })
                 }
             }
@@ -74,15 +83,17 @@
         class User {
             constructor(user, element) {
                 this.id = user.id
-                this.rank = user.user_rank
                 this.name = user.name
-                this.click_count = user.click_count
-                this.rank_with_ordinal = user.rank_with_ordinal
-                this.position = { top: 300 }
+                this.position = { top: 6000 }
                 this.opacity = 0
                 this.markForDeletionAt = null
                 this.index = null
-                this.new = {
+                this.client = {
+                    rank: user.user_rank,
+                    click_count: user.click_count,
+                    rank_with_ordinal: user.rank_with_ordinal
+                }
+                this.server = {
                     rank: user.user_rank,
                     click_count: user.click_count,
                     rank_with_ordinal: user.rank_with_ordinal
@@ -91,28 +102,27 @@
 
             setPoisition() {
                 if (this.markForDeletionAt != null) {
-                    this.position.top = 300
                     this.opacity = 0
+                    this.position.top = window.innerHeight + 100
                 } else {
                     this.opacity = 1
                     this.position.top = this.index * 30
                 }
-                this.rank = this.new.rank
-                this.rank_with_ordinal = this.new.rank_with_ordinal
+                this.client.rank = this.server.rank
+                this.client.rank_with_ordinal = this.server.rank_with_ordinal
                 this.countUp()
             }
+
             countUp() {
-                let interval = setInterval(() => {
-                    if (this.click_count < this.new.click_count) {
-                        this.click_count++
-                    } else {
-                        clearInterval(interval)
-                    }
-                }, 1000 / 60)
+                if (this.client.click_count < this.server.click_count) {
+                    this.client.click_count += 1
+                } else if (this.client.click_count > this.server.click_count) {
+                    this.client.click_count -= 1
+                }
             }
 
-            markForDeletion() {
-                this.markForDeletionAt = Date.now() + 1500
+            markForDeletion(timestamp) {
+                this.markForDeletionAt = timestamp + 2000
             }
         }
     </script>

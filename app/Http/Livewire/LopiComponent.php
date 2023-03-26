@@ -15,13 +15,21 @@ class LopiComponent extends Component
 
     public function poll()
     {
-        $this->userClicks = auth()->user()?->clicks->count() ?? 0;
+        if (auth()->check()) {
+            $this->userClicks = auth()->user()->clicks->count();
+            $this->rank = auth()->user()->rankWithOrdinal;
+        } else {
+            $this->userClicks = session('clicks');
+        }
         $this->totalClicks = Click::count();
-        $this->rank = auth()->user()?->rankWithOrdinal ?? null;
     }
 
     public function click()
     {
+        if (auth()->guest()) {
+            session(['clicks' => $this->userClicks + 1]);
+        }
+
         Click::create([
             'user_id' => auth()->user()?->id,
             'ip' => request()->ip(),
