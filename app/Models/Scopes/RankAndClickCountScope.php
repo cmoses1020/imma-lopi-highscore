@@ -24,7 +24,7 @@ class RankAndClickCountScope implements Scope
         ->whereNotNull('user_id')
         ->groupBy('user_id');
 
-        $builder->joinSub(
+        $builder->leftJoinSub(
             $clickQuery,
             'click_counts',
             fn ($join) => $join->on(

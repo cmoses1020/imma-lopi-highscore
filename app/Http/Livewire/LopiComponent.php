@@ -14,10 +14,11 @@ class LopiComponent extends Component
         $this->lopiCount = auth()->user()?->clicks->count() ?? 0;
     }
 
-    public function getRankAndTotalClicks()
+    public function getRankAndClicks()
     {
         return [
             'rank' => auth()->user()->placeInLeaderboard ?? null,
+            'user_clicks' => auth()->user()?->clicks->count() ?? 0,
             'total_clicks' => Click::count(),
         ];
     }
@@ -25,7 +26,7 @@ class LopiComponent extends Component
     public function click()
     {
         Click::create([
-            'user_id' => auth()->user()->id ?? null,
+            'user_id' => auth()->user()?->id,
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);

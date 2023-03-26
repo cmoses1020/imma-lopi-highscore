@@ -67,33 +67,50 @@
     <script>
         let lopi = () => {
             return {
+                totalClicksInterval: null,
+                countInterval: null,
+                countDelay: 1000 / 60,
                 init() {
-                    if (!this.isGuest) {
-                        window.addEventListener('beforeunload', (event) => {
-                            this.$wire.call('lopiCount', this.count)
-                        })
-
-                    }
-                    this.$wire.call('getRankAndTotalClicks').then((data) => {
+                    this.$wire.call('getRankAndClicks').then((data) => {
                         this.rank = data.rank
                         this.totalClicks = data.total_clicks
-                        setInterval(() => {
-                            this.$wire.call('getRankAndTotalClicks').then((data) => {
-                                this.rank = data.rank
 
-                                this.animateCountUp(data.total_clicks)
+                        setInterval(() => {
+                            this.$wire.call('getRankAndClicks').then((data) => {
+                                this.rank = data.rank
+                                this.animateTotalCounts(data.total_clicks)
+                                this.animateCounts(data.user_clicks)
                             })
-                        }, 500)
+                        }, 1000)
                     })
                 },
-                animateCountUp(count) {
-                    let interval = setInterval(() => {
+                animateCounts(count) {
+                    clearInterval(this.countInterval)
+                    this.countInterval = setInterval(() => {
+                        if (this.count == count) {
+                            clearInterval(this.countInterval)
+                        }
+
+                        if (this.count < count) {
+                            this.count++
+                        } else if (this.count > count) {
+                            this.count--
+                        }
+                    }, this.countDelay)
+                },
+                animateTotalCounts(count) {
+                    clearInterval(this.totalClicksInterval)
+                    this.totalClicksInterval = setInterval(() => {
+                        if (this.totalClicks == count) {
+                            clearInterval(this.totalClicksInterval)
+                        }
+
                         if (this.totalClicks < count) {
                             this.totalClicks++
-                        } else {
-                            clearInterval(interval)
+                        } else if (this.totalClicks > count) {
+                            this.totalClicks--
                         }
-                    }, 1000 / 15)
+                    }, this.countDelay)
                 },
                 sounds: [
                     new Audio("{{ Vite::asset('resources/lopi_assets/1.mp3') }}"),
@@ -101,7 +118,7 @@
                     new Audio("{{ Vite::asset('resources/lopi_assets/3.mp3') }}"),
                 ],
                 rank: null,
-                isGuest: @js(auth()->guest()),
+                isGuest: @js(auth()),
                 lastUpdate: null,
                 lopiImage: "{{ Vite::asset('resources/lopi_assets/lopi.png') }}",
                 count: @js($lopiCount),

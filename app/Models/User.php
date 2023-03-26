@@ -61,6 +61,10 @@ class User extends Authenticatable
 
     public function getRankWithOrdinalAttribute()
     {
+        if ($this->user_rank === null) {
+            return null;
+        }
+
         return (new NumberFormatter('en_US', NumberFormatter::ORDINAL))
             ->format($this->user_rank);
     }
