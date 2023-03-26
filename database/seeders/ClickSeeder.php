@@ -21,7 +21,7 @@ class ClickSeeder extends Seeder
             $id = $userIds->random();
 
             $createdClicks = Click::factory()
-                ->count(rand(1, 2))
+                ->count(rand(1, 10))
                 ->create(['user_id' => $id]);
             $this->command->info("Created {$createdClicks->count()} clicks for user ".($id ?? 'anonymous'));
 
