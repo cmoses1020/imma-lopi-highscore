@@ -2,9 +2,9 @@
 
 @section('content')
 
-    <div class="flex flex-col items-center justify-center min-h-screen">
+    <div class="flex flex-col mt-20 items-center min-h-screen">
         <div class="max-w-lg w-full">
-            <livewire:high-score-board maxRank="100" :paginate="true" />
+            <livewire:high-score-board maxRank="20" />
         </div>
     </div>
 

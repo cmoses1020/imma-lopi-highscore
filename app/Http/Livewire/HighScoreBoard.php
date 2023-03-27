@@ -37,26 +37,13 @@ class HighScoreBoard extends Component
         $this->users = User::orderBy('user_rank')
             ->select('id', 'name', 'user_rank', 'click_count')
             ->where('user_rank', '<=', $this->maxRank)
-            ->when(
-                $this->paginate,
-                fn ($q) => $q->paginate(10)
-                    ->tap(fn ($users) => $users->map($things))->items(),
-                fn ($q) => $q->get()->map($things)
-            );
+            ->get()
+            ->map($things);
     }
 
     public function render()
     {
         $this->poll();
-
-        if ($this->paginate) {
-            return view('livewire.high-score-board')
-                ->withPagination(
-                    User::orderBy('user_rank')
-                        ->select('id', 'name', 'user_rank', 'click_count')
-                        ->where('user_rank', '<=', $this->maxRank)->simplePaginate(10)
-                );
-        }
 
         return view('livewire.high-score-board');
     }

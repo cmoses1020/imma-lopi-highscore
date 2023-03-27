@@ -1,4 +1,4 @@
-<div x-data="scoreBoard" class="mb-24" wire:poll.1000ms="poll">
+<div x-data="scoreBoard" class="mb-24" wire:poll.3000ms="poll">
     <div class="text-3xl mb-2 text-center">
         High Scores
     </div>
@@ -26,14 +26,6 @@
                 <div x-text="user.client.click_count"></div>
             </div>
         </template>
-        @if ($paginate)
-            <div
-                class="px-4 py-2 flex w-full justify-between absolute transition-all duration-[1000ms] ease-in-out"
-                :style="{top: client.users.filter((user) => user.markForDeletionAt == null).length * gap + 'px'}"
-            >
-                {{ $pagination->links() }}
-            </div>
-        @endif
     </div>
 </div>
 
