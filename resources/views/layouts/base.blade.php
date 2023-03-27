@@ -26,21 +26,27 @@
 
     <body class="bg-pink-pattern bg-repeat">
         <div class="px-8 py-4 flex justify-between w-full">
-            <div>
-                <a href="{{ route('home') }}" class="flex uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500">Home</a>
+            <div class="flex space-x-6 items-center">
+                <a href="{{ route('home') }}" class="block transition duration-300 uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500 hover:scale-110">Home</a>
+                <a href="{{ route('high-score') }}" class="block transition duration-300 uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500 hover:scale-110">High Scores</a>
             </div>
             
-            <div class="flex space-y-4 items-center">
-                <div class="flex text-3xl">
-                    <div>
-                        <x-fa-brands-fa-discord class="transition duration-300 hover:scale-150" />
-                    </div>
-
-                    <a title="twitter.com/Punkalopi" class="block transition duration-300 hover:scale-150" href="https://twitter.com/Punkalopi" target="_blank">
-                        🐦
-                    </a>
+            <div class="flex space-x-6 items-center">
+                <div>
+                <a href="{{ route('about') }}" class="block transition duration-300 uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500 hover:scale-110">About Us</a>
                 </div>
-                <a href="{{ route('about') }}" class="flex uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500">About Us</a>
+
+                <a href="https://www.youtube.com/@Punkalopi" target="_blank" class="block transition duration-300 hover:scale-150">
+                    <x-fab-youtube class="text-lopi-purple-700 hover:text-lopi-purple-500 w-10 h-10 transition duration-300 hover:scale-110" />
+                </a>
+
+                <a href="https://discord.com/invite/ZBck86Wr79" target="_blank" class="block transition duration-300 hover:scale-150">
+                    <x-fab-discord class="text-lopi-purple-700 w-10 h-10 transition duration-300 hover:text-lopi-purple-500 hover:scale-110" />
+                </a>
+
+                <a title="twitter.com/Punkalopi" class="block transition duration-300 hover:scale-150" href="https://twitter.com/Punkalopi" target="_blank">
+                    <x-fab-twitter class="text-lopi-purple-700 w-10 h-10 transition duration-300 hover:text-lopi-purple-500 hover:scale-110" />
+                </a>
             </div>
         </div>
         @yield('body')
