@@ -67,7 +67,7 @@
                 to track your Lopi count!
             </div>
         @endguest
-        <livewire:high-score-board />
+        <livewire:high-score-board maxRank="10" />
     </div>
 
 </div>
@@ -143,7 +143,7 @@
             fadeTime = Math.floor(Math.random() * 4000) + 1000;
             faded = false
             make(overlay) {
-                this.sound.playbackRate = Math.random() * 1.75 + .25
+                this.sound.playbackRate = 1.00
                 this.sound.play()
                 this.element = document.createElement('img')
                 this.element.src = this.image

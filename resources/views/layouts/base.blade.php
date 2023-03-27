@@ -25,6 +25,24 @@
     </head>
 
     <body class="bg-pink-pattern bg-repeat">
+        <div class="px-8 py-4 flex justify-between w-full">
+            <div>
+                <a href="{{ route('home') }}" class="flex uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500">Home</a>
+            </div>
+            
+            <div class="flex space-y-4 items-center">
+                <div class="flex text-3xl">
+                    <div>
+                        <x-fa-brands-fa-discord class="transition duration-300 hover:scale-150" />
+                    </div>
+
+                    <a title="twitter.com/Punkalopi" class="block transition duration-300 hover:scale-150" href="https://twitter.com/Punkalopi" target="_blank">
+                        🐦
+                    </a>
+                </div>
+                <a href="{{ route('about') }}" class="flex uppercase font-medium text-sm items-center justify-center text-lopi-purple-700 hover:text-lopi-purple-500">About Us</a>
+            </div>
+        </div>
         @yield('body')
         @stack('scripts')
     </body>

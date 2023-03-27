@@ -29,6 +29,9 @@ Route::get('/', LopiComponent::class)
 Route::get('high-score', fn () => view('high-score'))
     ->name('high-score');
 
+Route::get('about', fn () => view('about'))
+    ->name('about');
+
 Route::get('leaderboard', LeaderBoardController::class)
     ->name('leaderboard');
 
